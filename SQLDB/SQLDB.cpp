@@ -87,7 +87,48 @@ int main()
 
     if (con)
     {
-        mysqlfuncs.StatementExecuter("CREATE DATABASE IF NOT EXISTS weather", con);
+        int choice = 1;
+
+        cout << "***************************************************\nWELCOME TO CPP BASED SERVER EDITOR\n**************************************************\n" << endl;
+        cout << "What would you like to do ?" << endl;
+        cout << "Enter 1 for creating or selecting a database\nEnter 2 for creating or selecting a table\nEnter 3 for inputting data\nEnter 4 for retrieving data" << endl;
+
+        cin >> choice;
+
+        string tableName, parameters, createdbName, currentdbName;
+
+
+
+        switch (choice)
+        {
+        case 1: 
+            cout << "Enter database name\n";
+            cin >> createdbName;
+
+            mysqlfuncs.StatementExecuter("CREATE DATABASE IF NOT EXISTS "+createdbName, con);
+            mysqlfuncs.StatementExecuter("USE "+createdbName, con);
+            break;
+        case 2:
+            cout << "Enter the current database name\n";
+            cin >> currentdbName;
+            cout << "Enter table name\n";
+            cin >> tableName;
+            cout << "Enter parameters\n";
+            cin.ignore();
+            getline(cin, parameters);
+            
+
+            mysqlfuncs.StatementExecuter("USE " + currentdbName, con);
+            mysqlfuncs.StatementExecuter("CREATE TABLE IF NOT EXISTS " + tableName + " (" + parameters + ")", con);
+            break;
+
+        default:
+            cout << "enter valid";
+            break;
+
+        }
+
+      /*  mysqlfuncs.StatementExecuter("CREATE DATABASE IF NOT EXISTS weather", con);
         mysqlfuncs.StatementExecuter("USE weather", con);
 
         // Create the weather_data table
@@ -102,11 +143,11 @@ int main()
         // Insert sample data
         mysqlfuncs.StatementExecuter("INSERT INTO weather_data (city, temperature) VALUES ('Mumbai', 32)", con);
         mysqlfuncs.StatementExecuter("INSERT INTO weather_data (city, temperature) VALUES ('Delhi', 30)", con);
-
-        int temperature = mysqlfuncs.RetrieveTemperatureForCity("Delhi", con);
-        if (temperature != 0) {
-            cout << "Temperature for Delhi: " << temperature << "°C" << endl;
-        }
+        */
+       // int temperature = mysqlfuncs.RetrieveTemperatureForCity("Delhi", con);
+       // if (temperature != 0) {
+      //     cout << "Temperature for Delhi: " << temperature << "°C" << endl;
+       // }
 
         mysqlfuncs.ServerDisconnector(con);
     }
