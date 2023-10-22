@@ -22,7 +22,6 @@ public:
 };
 
 
-
 Connection* MySQLfuncs::ServerConnector(string host, string user, string password)
 {
     MySQL_Driver* driver = get_mysql_driver_instance();
@@ -80,6 +79,14 @@ int MySQLfuncs::RetrieveTemperatureForCity(string city, Connection* con)
     return temperature;
 }
 
+struct weatherlog
+{
+    int entryID;
+    string city;
+    int time;
+    string event;
+};
+
 int main()
 {
     MySQLfuncs mysqlfuncs;
@@ -96,7 +103,7 @@ int main()
         cin >> choice;
 
         string tableName, parameters, createdbName, currentdbName;
-
+        bool shouldContinue;
 
 
         switch (choice)
@@ -107,23 +114,77 @@ int main()
 
             mysqlfuncs.StatementExecuter("CREATE DATABASE IF NOT EXISTS "+createdbName, con);
             mysqlfuncs.StatementExecuter("USE "+createdbName, con);
-            break;
+            cout << "Do you want to continue to the next option? (1 for yes, 0 for no)\n";
+            cin >> shouldContinue;
+            if (!shouldContinue)
+            {
+                return 0; // This exits the current function
+            }
+            
+
+            
+
+            
         case 2:
+        
             cout << "Enter the current database name\n";
             cin >> currentdbName;
             cout << "Enter table name\n";
             cin >> tableName;
-            cout << "Enter parameters\n";
-            cin.ignore();
-            getline(cin, parameters);
+            mysqlfuncs.StatementExecuter("USE " + currentdbName, con);
+
+            mysqlfuncs.StatementExecuter("CREATE TABLE IF NOT EXISTS " + tableName + " (entryID INT, city VARCHAR(255), time INT, event VARCHAR(255));", con);
             
 
+            
+            cout << "Do you want to continue to the next option? (1 for yes, 0 for no)\n";
+            cin >> shouldContinue;
+            if (!shouldContinue)
+            {
+                return 0; 
+            };
+
+        case 3:
+            cout << "Enter the current database name\n";
+            cin >> currentdbName;
+            cout << "Enter table name\n";
+            cin >> tableName;
             mysqlfuncs.StatementExecuter("USE " + currentdbName, con);
-            mysqlfuncs.StatementExecuter("CREATE TABLE IF NOT EXISTS " + tableName + " (" + parameters + ")", con);
-            break;
+            bool again;
+
+            do {
+                weatherlog weatherlog1;
+                cout << "Enter the entry id: ";
+                cin >> weatherlog1.entryID;
+                cout << "Enter the city: ";
+                cin >> weatherlog1.city;
+                cout << "Enter the date in ddmmyy: ";
+                cin >> weatherlog1.time;
+                cout << "Enter the event type: ";
+                cin >> weatherlog1.event;
+
+                string insertSQL = "INSERT INTO " + tableName + " (entryID, city, time, event) VALUES ("
+                    + to_string(weatherlog1.entryID) + ", '"
+                    + weatherlog1.city + "', "
+                    + to_string(weatherlog1.time) + ", '"
+                    + weatherlog1.event + "');";
+                mysqlfuncs.StatementExecuter(insertSQL, con);
+
+                cout << "Do you want to insert another record? (1/0): ";
+                cin >> again;
+            } while (again);
+            cout << "Do you want to continue to the next option? (1 for yes, 0 for no)\n";
+            cin >> shouldContinue;
+            if (!shouldContinue)
+            {
+                return 0; // This exits the current function
+            };
+            
+             
+
 
         default:
-            cout << "enter valid";
+            cout << "enter valid\n";
             break;
 
         }
